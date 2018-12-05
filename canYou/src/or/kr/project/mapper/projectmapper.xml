@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="project">
+	<select id="casel" resultType="cvo">
+		select * from category
+	</select>
+	
+	<select id="memname" parameterType="int" resultType="String">
+		select memberName from member where memberNo=#{memberNo}
+	</select>
+	
+	<insert id="proin" parameterType="projvo">
+		insert into project
+		values(project_seq.nextVal, #{memberNo}, #{projectName}, 
+		#{projectCost}, sysdate, TO_DATE(#{projectEndDate},'yyyy-mm-dd'),
+		 0, #{projectMainImage}, #{projectStory}, 
+		 'Z', 2, #{categoryNo}, 0)
+	</insert>
+</mapper>

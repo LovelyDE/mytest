@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/mvc"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:beans="http://www.springframework.org/schema/beans"
+ xmlns:context="http://www.springframework.org/schema/context"
+ xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+  http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+ <!-- DispatcherServlet Context: defines this servlet's request-processing 
+  infrastructure -->
+ <context:component-scan base-package="or.kr.project" />
+ <!-- Enables the Spring MVC @Controller programming model -->
+ <annotation-driven />
+
+ <!-- Handles HTTP GET requests for /resources/** by efficiently serving 
+  up static resources in the ${webappRoot}/resources directory -->
+ <resources mapping="/resources/**" location="/resources/" />
+
+
+ <beans:bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+  <beans:property name="jndiName" value="java:comp/env/jdbc/myora" />
+ </beans:bean>
+
+ <!-- MyBatis설정 -->
+ <beans:bean id="factoryBean" class="org.mybatis.spring.SqlSessionFactoryBean">
+  <beans:property name="dataSource" ref="dataSource" />
+  <beans:property name="configLocation" value="classpath:or/kr/project/config/config.xml" />
+  <beans:property name="mapperLocations" value="classpath*:or/kr/project/mapper/*.xml" />
+ </beans:bean>
+ <beans:bean id="ss" class="org.mybatis.spring.SqlSessionTemplate">
+  <beans:constructor-arg ref="factoryBean" />
+ </beans:bean> 
+    
+
+ <!-- Resolves views selected for rendering by @Controllers to .jsp resources 
+  in the /WEB-INF/views directory -->
+ <beans:bean
+  class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+  <beans:property name="prefix" value="/WEB-INF/views/" />
+  <beans:property name="suffix" value=".jsp" />
+ </beans:bean>
+<!-- ModelAndView로부터 얻어온 value,viewName을 Dispatcher에게 전달할 목적 -->
+   <beans:bean id="multipartResolver"
+   class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+   </beans:bean>
+
+
+</beans:beans>

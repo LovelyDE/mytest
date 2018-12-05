@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<typeAliases>
+		<typeAlias alias="mvo" type="or.kr.project.dto.MemberVO" />
+		<typeAlias alias="projvo" type="or.kr.project.dto.ProjectVO" />
+		<typeAlias alias="prodvo" type="or.kr.project.dto.ProductVO" />
+		<typeAlias alias="cvo" type="or.kr.project.dto.CategoryVO" />
+		<typeAlias alias="rvo" type="or.kr.project.dto.ReplyVO"/>
+		<typeAlias alias="hvo" type="or.kr.project.dto.HashtagVO"/>
+	</typeAliases>
+</configuration>
