@@ -110,7 +110,7 @@ $(document).ready(function(){
 		<ul>
 			<li><h2>선물 추가하기</h2></li>
 			<li>선물 구성 : <textarea id="productName" rows="5" cols="30"></textarea></li>
-			<li>선물 갯수 : <input type="number" id="productCnt"></li>
+			<li>선물 갯수 : <input type="number" id="productCnt" min=1></li>
 			<li>선물 설명 : <textarea id="productInfo" rows="5" cols="30"></textarea></li>
 			<li>후원 금액 : <input type="text" id="productCost"></li>
 			<li><input type="button" id="preadd" value="선물 추가"></li>
