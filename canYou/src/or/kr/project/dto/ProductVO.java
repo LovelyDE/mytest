@@ -4,7 +4,7 @@ public class ProductVO {
 	private int productNo;
 	private String productName;
 	private int productCnt;
-	private String productinfo;
+	private String productInfo;
 	private int productCost;
 	private int projectNo;
 	public int getProductNo() {
@@ -26,10 +26,10 @@ public class ProductVO {
 		this.productCnt = productCnt;
 	}
 	public String getProductinfo() {
-		return productinfo;
+		return productInfo;
 	}
-	public void setProductinfo(String productinfo) {
-		this.productinfo = productinfo;
+	public void setProductinfo(String productInfo) {
+		this.productInfo = productInfo;
 	}
 	public int getProductCost() {
 		return productCost;

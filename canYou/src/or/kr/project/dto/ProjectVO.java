@@ -14,7 +14,7 @@ public class ProjectVO {
 	private int projectStatus;
 	private int categoryNo;
 	private int projectCurCost;
-	
+
 	public int getProjectCurCost() {
 		return projectCurCost;
 	}

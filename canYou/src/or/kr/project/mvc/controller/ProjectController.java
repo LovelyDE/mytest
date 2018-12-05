@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import or.kr.project.dto.CategoryVO;
+import or.kr.project.dto.ProductVO;
 import or.kr.project.dto.ProjectVO;
 import or.kr.project.mvc.dao.projectDaoImple;
 
@@ -42,21 +43,50 @@ public class ProjectController {
 	}
 	
 	@RequestMapping(value="/proup")
-	public ModelAndView proup(@ModelAttribute("projvo") ProjectVO vo, MultipartFile mfile, HttpServletRequest request) {
+	public ModelAndView proup(@ModelAttribute("projvo") ProjectVO vo, MultipartFile mfile,
+			String proname, String procnt, String proinfo, String procost,
+			HttpServletRequest request) {
+		ProductVO prodvo = new ProductVO();
+		String[] pname=proname.split(",");
+		String[] pcnt=procnt.split(",");
+		String[] pinfo=proinfo.split(",");
+		String[] pcost=procost.split(",");
+		
 		String img_path = "resources\\images";
 		String r_path = request.getRealPath("/");
-		String oriFn = mfile.getOriginalFilename();
+		String oriFn;
+		
+		if (mfile==null) {
+			oriFn = "null.jpg";
+		}else {
+			oriFn = mfile.getOriginalFilename();
+		}
 		StringBuffer path = new StringBuffer();
 		path.append(r_path).append(img_path).append("\\");
 		path.append(oriFn);
-		File f = new File(path.toString());
-		try {
-			mfile.transferTo(f);
-		}catch (IllegalStateException | IOException e) {
-			e.printStackTrace();
+		
+		if(mfile!=null) {
+			File f = new File(path.toString());
+			try {
+				mfile.transferTo(f);
+			}catch (IllegalStateException | IOException e) {
+				e.printStackTrace();
+			}
 		}
-		vo.setProjectMainImage(mfile.getOriginalFilename());
+		
+		vo.setProjectMainImage(oriFn);
 		dao.proin(vo);
+		
+		for(int i=0; i<pname.length; i++) {
+			
+			prodvo.setProductCnt(Integer.parseInt(pcnt[i]));
+			prodvo.setProductName(pname[i]);
+			prodvo.setProductinfo(pinfo[i]);
+			prodvo.setProductCost(Integer.parseInt(pcost[i]));
+			prodvo.setProjectNo(vo.getProjectNo());
+			
+			dao.prodin(prodvo);
+		}
 		
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("redirect:/proupsuccess");

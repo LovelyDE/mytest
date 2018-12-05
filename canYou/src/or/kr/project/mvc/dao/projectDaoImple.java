@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import or.kr.project.dto.CategoryVO;
+import or.kr.project.dto.ProductVO;
 import or.kr.project.dto.ProjectVO;
 
 
@@ -25,5 +26,9 @@ public class projectDaoImple implements projectDao{
 		
 		public void proin(ProjectVO vo) {
 			ss.insert("project.proin", vo);
+		}
+		
+		public void prodin(ProductVO vo) {
+			ss.insert("project.prodin", vo);
 		}
 }

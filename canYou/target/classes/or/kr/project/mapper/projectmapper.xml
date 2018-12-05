@@ -17,5 +17,17 @@
 		#{projectCost}, sysdate, TO_DATE(#{projectEndDate},'yyyy-mm-dd'),
 		 0, #{projectMainImage}, #{projectStory}, 
 		 'Z', 2, #{categoryNo}, 0)
+		<selectKey keyProperty="projectNo" resultType="int" order="AFTER">
+       		SELECT project_seq.CURRVAL FROM dual
+    	</selectKey>
+	</insert>
+	
+	<select id="projseq" resultType="int">
+		select project_seq.CURRVAL FROM dual;
+	</select>
+	
+	<insert id="prodin" parameterType="prodvo">
+		insert into product
+		values(product_seq.nextVal, #{productName}, #{productCnt}, #{productInfo}, #{productCost}, #{projectNo})
 	</insert>
 </mapper>
