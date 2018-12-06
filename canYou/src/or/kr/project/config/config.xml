@@ -10,5 +10,6 @@
 		<typeAlias alias="cvo" type="or.kr.project.dto.CategoryVO" />
 		<typeAlias alias="rvo" type="or.kr.project.dto.ReplyVO"/>
 		<typeAlias alias="hvo" type="or.kr.project.dto.HashtagVO"/>
+		<typeAlias alias="dvo" type="or.kr.project.dto.ProjectDonateVO" />
 	</typeAliases>
 </configuration>

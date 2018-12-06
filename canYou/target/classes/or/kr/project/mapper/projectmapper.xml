@@ -3,14 +3,17 @@
 	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="project">
+	<!-- 모든 카테고리 목록 불러옴 -->
 	<select id="casel" resultType="cvo">
 		select * from category
 	</select>
 	
+	<!-- 회원 아이디로 회원 번호, 이름을 가져옴 -->
 	<select id="memname" parameterType="String" resultType="mvo">
 		select memberNo, memberName from member where memberId=#{memberId}
 	</select>
 	
+	<!-- 프로젝트 업로드 -->
 	<insert id="proin" parameterType="projvo">
 		insert into project
 		values(project_seq.nextVal, #{memberNo}, #{projectName}, 
@@ -22,12 +25,86 @@
     	</selectKey>
 	</insert>
 	
-	<select id="projseq" resultType="int">
-		select project_seq.CURRVAL FROM dual;
-	</select>
-	
+	<!-- 상품 추가 -->	
 	<insert id="prodin" parameterType="prodvo">
 		insert into product
 		values(product_seq.nextVal, #{productName}, #{productCnt}, #{productInfo}, #{productCost}, #{projectNo})
 	</insert>
+	
+		<!-- 리스트 -->
+	<select id="list" resultType="projvo">
+		select projectNo ,memberNo
+		,projectName ,projectCost
+		,projectStartDate,
+		projectEndDate,projectFundCnt,
+		projectMainImage,projectStory,projectStep,projectStatus
+		,categoryNo,
+		projectCurCost from project
+	</select>
+	
+	<!-- 마이페이지 후원 목록 리스트 -->
+	<select id="mydonate" parameterType="int" resultType="projvo">
+		select projectNo ,memberNo
+		,projectName ,projectCost
+		,projectStartDate,
+		projectEndDate,projectFundCnt,
+		projectMainImage,projectStory,projectStep,projectStatus
+		,categoryNo,
+		projectCurCost from project where projectno in (
+		select projectno
+		from projectdonate
+		where memberno=#{num})
+	</select>
+
+	<!-- 수정 -->
+	<update id="modify" parameterType="projvo" timeout="20">
+		update project SET projectName = #{projectName} , projectCost = #{projectCost} , projectMainImage =
+		#{projectMainImage} , projectStory = #{projectStory} WHERE projectNo=1
+	</update>
+	
+	<!-- 후원 추가 1 (행 추가) -->
+	<insert id="donate" parameterType="dvo">
+		<choose>
+			<when test="productNo!=0">
+				insert into projectdonate values(
+					donate_seq.nextVal,#{memberNo},#{projectNo},#{productNo},#{donateMoney},'선결제'
+				)
+			</when>
+			<otherwise>
+				insert into projectdonate values(
+					donate_seq.nextVal,#{memberNo},#{projectNo},null,#{donateMoney},'선결제'
+				)
+			</otherwise>
+		</choose>
+	</insert>
+	
+	<!-- 후원 추가 1 (돈 빼기)-->
+	<update id="donateMoney" parameterType="HashMap">
+		update member
+		set memberCash = memberCash - #{donateMoney}
+		where memberNo=#{memberNo}
+	</update>
+	
+	<!-- 후원 취소2 (행 삭제) -->
+	<delete id="cancle" parameterType="int">
+		delete
+		from projectDonate
+		where memberNo = #{memberNo}
+	</delete>
+	
+	<!-- 후원 취소 2 (돈 반환) -->
+	<update id="returnMoney" parameterType="HashMap">
+		update member
+		set memberCash = memberCash + #{donateMoney}
+		where memberNo=#{memberNo}
+	</update>
+	
+	<!-- 후원 취소를 하기 위해 자신이 한 프로젝트에
+	후원한 목록들을 가져오는 sql 구문 -->
+	<select id="mydonatelist" parameterType="int" resultType="dvo">
+		select donateMoney
+		from projectDonate
+		where memberNo=#{memberNo}
+	</select>
+	
 </mapper>

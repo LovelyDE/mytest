@@ -8,5 +8,6 @@
 </head>
 <body>
 <a href="proupform">프로젝트 업로드</a>
+<a href="list">list</a>
 </body>
 </html>
