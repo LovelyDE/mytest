@@ -16,7 +16,7 @@
 
 <http authentication-manager-ref="jdbc-auth"
 access-decision-manager-ref="accessDecisionManager">
-	<intercept-url pattern="/emp/**" access="Admin,User"/>
+	<intercept-url pattern="/proupform" access="1,2"/>
 <!--<intercept-url pattern="/bbs1detail" access="User"/> -->
 <!--<intercept-url pattern="/bbs1Form" access="User"/>-->
 	<form-login login-page="/login"
@@ -33,20 +33,20 @@ access-decision-manager-ref="accessDecisionManager">
 	</session-management>
 </http>
 
-
- <authentication-manager id="in-memory-auth">
+<!--  삭제 예정 -->
+<!-- <authentication-manager id="in-memory-auth">
   <authentication-provider>
    <user-service>
     <user name="javabook" password="test00" authorities="Admin" />
    </user-service>
   </authentication-provider>
- </authentication-manager>
+ </authentication-manager> -->
  
   <authentication-manager id="jdbc-auth">
   <authentication-provider>
    <jdbc-user-service data-source-ref="dataSource"
-    users-by-username-query="select username,password,enabled from Employees where username = ?"
-    authorities-by-username-query="select username,role from Roles where username = ?" />
+    users-by-username-query="select memberid as username,memberpwd as password, memberenabled as enabled from member where memberid = ?"
+    authorities-by-username-query="select memberid as username,membergrant as role from member where memberid = ?" />
   </authentication-provider>
  </authentication-manager>
  

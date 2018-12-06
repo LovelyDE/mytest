@@ -90,7 +90,6 @@ $(document).ready(function(){
 <body>
 <h1>프로젝트 업로드</h1>
 <form action="proup" method="post" enctype="multipart/form-data">
-<input type="hidden" name="memberNo" value="${memberNo }">
 <input type="hidden" id="proname" name="proname">
 <input type="hidden" id="procnt" name="procnt">
 <input type="hidden" id="proinfo" name="proinfo">

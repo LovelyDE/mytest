@@ -4,9 +4,11 @@
 <html>
 <head>
 <meta charset="EUC-KR">
-<title>Insert title here</title>
+<title>Access Denied</title>
 </head>
 <body>
-<a href="proupform">프로젝트 업로드</a>
+<h1>
+	Access Denied!
+</h1>
 </body>
 </html>

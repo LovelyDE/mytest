@@ -7,8 +7,8 @@
 		select * from category
 	</select>
 	
-	<select id="memname" parameterType="int" resultType="String">
-		select memberName from member where memberNo=#{memberNo}
+	<select id="memname" parameterType="String" resultType="mvo">
+		select memberNo, memberName from member where memberId=#{memberId}
 	</select>
 	
 	<insert id="proin" parameterType="projvo">
