@@ -40,8 +40,13 @@ public class ProjectController {
 	@Autowired
 	private projectDaoImple dao;
 	
-	@RequestMapping(value="/index")
+	@RequestMapping(value="/")
 	public String index(HttpServletRequest request, Model model) {
+		return "index";
+	}
+	
+	@RequestMapping(value="index")
+	public String index2(HttpServletRequest request, Model model) {
 		return "index";
 	}
 	
@@ -59,6 +64,16 @@ public class ProjectController {
 	@RequestMapping(value="/denied")
 	public String denied() {
 		return "denied";
+	}
+	
+	@RequestMapping(value="/error404")
+	public String error404() {
+		return "error404";
+	}
+	
+	@RequestMapping(value="/error500")
+	public String error500() {
+		return "error500";
 	}
 	
 	@RequestMapping(value="/proupform")		// 프로젝트 업로드 폼 페이지

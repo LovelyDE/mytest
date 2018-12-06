@@ -7,8 +7,7 @@
 <title>Insert title here</title>
 </head>
 <body>
-<p><a href="proupform">프로젝트 업로드</a></p>
-<p><a href="list">list</a></p>
-<p><a href="update">프로젝트 수정</a></p>
+<p>요청하신 페이지를 찾을 수 없습니다.</p>
+<p><a href="index">메인으로</a>
 </body>
 </html>
