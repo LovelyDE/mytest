@@ -25,10 +25,10 @@ public class ProductVO {
 	public void setProductCnt(int productCnt) {
 		this.productCnt = productCnt;
 	}
-	public String getProductinfo() {
+	public String getProductInfo() {
 		return productInfo;
 	}
-	public void setProductinfo(String productInfo) {
+	public void setProductInfo(String productInfo) {
 		this.productInfo = productInfo;
 	}
 	public int getProductCost() {

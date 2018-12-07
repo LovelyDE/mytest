@@ -1,5 +1,7 @@
 package or.kr.project.dto;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public class ProjectVO {
 	private int projectNo;
 	private int memberNo;
@@ -14,7 +16,14 @@ public class ProjectVO {
 	private int projectStatus;
 	private int categoryNo;
 	private int projectCurCost;
+	private MultipartFile multipartFile;
 
+	public MultipartFile getMultipartFile() {
+		return multipartFile;
+	}
+	public void setMultipartFile(MultipartFile multipartFile) {
+		this.multipartFile = multipartFile;
+	}
 	public int getProjectCurCost() {
 		return projectCurCost;
 	}

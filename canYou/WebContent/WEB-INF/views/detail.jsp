@@ -1,68 +1,137 @@
 <%@ page language="java" contentType="text/html; charset=EUC-KR"
-	pageEncoding="EUC-KR"%>
+    pageEncoding="EUC-KR"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html>
 <head>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<style>
+#tv {
+    border: 1px solid black;
+}
+</style>
 <meta charset="EUC-KR">
 <title>detail.jsp</title>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
 </head>
 <body>
-	<div>
+<div>
 		<fieldset>
 			<legend>Project List</legend>
-				<table>
-					<thead></thead>
-					<tbody>
-						<c:forEach var="e" items="${list}">
-							<input type="hidden" id="projectNo" value="${e.projectNo}" name="projectNo">
-							<tr>
-								<td>프로젝트 명 : ${e.projectName}</td>
-							</tr>
-							<tr>
-								<td>목표금액 : ${e.projectCost}</td>
-							</tr>
-							<tr>
-								<td>프로젝트 시작날짜 : ${e.projectStartDate}</td>
-							</tr>
-							<tr>
-								<td>프로젝트 마감날짜 : ${e.projectEndDate}</td>
-							</tr>
-							<tr>
-								<td>후원자 수 : ${e.projectFundCnt}</td>
-							</tr>
-							<tr>
-								<td>프로젝트 이미지 :</td>
-								<td><img id="projectMainImage"
-									src="resources/images/${e.projectMainImage }"
-									style="margin: 60px 10px 10px 10px; width: 260px; height: 280px;">
-								</td>
+			<form action="update" method="POST" >
+			<input type="hidden" id="projectNo" name="projectNo" value="${list.projectNo}">
+			<table>
+				<thead></thead>
+				<tbody>
+						<tr>
+							<td>프로젝트 번호 : ${list.projectNo}</td>
+						</tr>
+						<tr>
+							<td>회원이름 : ${member.memberName}</td>
+						</tr>
+						<tr>
+							<td>프로젝트 명 : ${list.projectName}</td>
+						</tr>
+						<tr>
+							<td>목표금액 : ${list.projectCost}</td>
+						</tr>
+						<tr>
+							<td>프로젝트 시작날짜 : ${list.projectStartDate}</td>
+						</tr>
+						<tr>
+							<td>프로젝트 마감날짜 : ${list.projectEndDate}</td>
+						</tr>
+						<tr>
+							<td>후원자 수 : ${list.projectFundCnt}</td>
+						</tr>
+						<tr>
+							<td>프로젝트 이미지 :</td>
+							<td><img id="projectMainImage"
+								src="resources/images/${list.projectMainImage }"
+								style="margin: 60px 10px 10px 10px; width: 260px; height: 280px;">
+							</td>
 							</tr>
 
-							<tr>
-								<td>프로젝트 스토리 : ${e.projectStory}</td>
-							</tr>
-							<tr>
-								<td>프로젝트 등급 : ${e.projectStep}</td>
-							</tr>
-							<tr>
-								<td>추가 후원 : <input type="text" name="donateMoney" id="donateMoney"></td>
-							</tr>
-							<tr>
-								<td><input type="button" class="donateBtn" value="후원">
-								</td>
-							</tr>
-						</c:forEach>
-					</tbody>
-					<tfoot>
+						<tr>
+							<td>프로젝트 스토리 : ${list.projectStory}</td>
+						</tr>
+						<tr>
+							<td>프로젝트 등급 : ${list.projectStep}</td>
+						</tr>
+						<tr>
+							<td>진행여부 : ${list.projectStatus}</td>
+						</tr>
+						<tr>
+							<td>카테고리 번호 : ${list.categoryNo}</td>
+						</tr>
+						<tr>
+						<td>
 
-					</tfoot>
-				</table>
+								<c:forEach var="e2" items="${prodlist}">
+									<div style="border:1px solid gold;">
+									<p>${e2.productCost }원 이상 구매 시</p>
+									<h2>${e2.productName }</h2>
+									<p>${e2.productInfo }</p>
+									<p>${e2.productCnt }개 남음</p>
+									</div>
+								</c:forEach>
+						</td>
+						</tr>
+						<tr>
+							<td>추가 후원 : <input type="text" name="donateMoney" id="donateMoney"></td>
+						</tr>
+						<tr>
+							<td><input type="button" class="donateBtn" value="후원"></td>
+						</tr>
+						
+				</tbody>
+					
+				<tfoot>
+				<c:choose>
+					<c:when test="${pageContext.request.userPrincipal.name eq member.memberId }">
+					<tr>
+						<td colspan="14">
+						<input type="submit" id="wBtn" value="수정">
+						</td>
+					</tr>
+					</c:when>
+				</c:choose>
+				</tfoot>
+			</table>
+			</form>
+			<form method="post" action="reply1">
+			<table>
+				<tr>
+					<td>
+					<c:choose>
+						<c:when test="${pageContext.request.userPrincipal.name==null}">
+							<textarea rows="3" cols="30" name="replyContent" disabled>로그인 해주세요</textarea>
+						</c:when>
+						<c:when test="${pageContext.request.userPrincipal.name!=null}">
+							<textarea rows="3" cols="30" name="replyContent"></textarea>
+						</c:when>
+					</c:choose>
+					</td>
+					<td><input type="submit" value="작성"></td>
+				</tr>
+			</table>
+		</form>
 		</fieldset>
+		<table id= "tv">
+		
+			<c:forEach var="s" items="${replylist}">
+			
+				<tr>
+					<td>멤버번호 : ${s.memberNo}</td>	
+					<td>내용 : ${s.replyContent}</td>
+					<td>날짜 : ${s.replyDate}</td>
+				</tr>
+				
+			</c:forEach>
+
+		</table> 
 	</div>
 </body>
-
 <script>
 	$(function() {
 		$('.donateBtn').each(function(index, item) {
@@ -81,5 +150,5 @@
 		});
 	});
 </script>
-
 </html>
+

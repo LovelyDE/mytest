@@ -8,7 +8,7 @@
 		<typeAlias alias="projvo" type="or.kr.project.dto.ProjectVO" />
 		<typeAlias alias="prodvo" type="or.kr.project.dto.ProductVO" />
 		<typeAlias alias="cvo" type="or.kr.project.dto.CategoryVO" />
-		<typeAlias alias="rvo" type="or.kr.project.dto.ReplyVO"/>
+		<typeAlias alias="replyvo" type="or.kr.project.dto.ReplyVO"/>
 		<typeAlias alias="hvo" type="or.kr.project.dto.HashtagVO"/>
 		<typeAlias alias="dvo" type="or.kr.project.dto.ProjectDonateVO" />
 	</typeAliases>

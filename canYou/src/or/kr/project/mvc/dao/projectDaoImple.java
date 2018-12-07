@@ -13,6 +13,7 @@ import or.kr.project.dto.MemberVO;
 import or.kr.project.dto.ProductVO;
 import or.kr.project.dto.ProjectDonateVO;
 import or.kr.project.dto.ProjectVO;
+import or.kr.project.dto.ReplyVO;
 
 
 @Repository
@@ -28,6 +29,10 @@ public class projectDaoImple implements projectDao{
 			return ss.selectOne("project.memname", s);
 		}
 		
+		public MemberVO memname2(int i) {
+			return ss.selectOne("project.memname2", i);		// 회원이 누구인지 가져오기 위한 sql문 (회원 번호로 가져옴)
+		}
+		
 		public void proin(ProjectVO vo) {		// 프로젝트 insert문
 			ss.insert("project.proin", vo);
 		}
@@ -36,8 +41,12 @@ public class projectDaoImple implements projectDao{
 			ss.insert("project.prodin", vo);
 		}
 		
-		public List<ProjectVO> projectlist() {
-			return ss.selectList("project.list");
+		public List<ProductVO> prodsel(String s){	// 상품 select문
+			return ss.selectList("project.prodsel", s);
+		}
+		
+		public ProjectVO modifyview(String s) {
+			return ss.selectOne("project.modifyview", s);
 		}
 
 		public void modify(ProjectVO vo) {
@@ -88,5 +97,32 @@ public class projectDaoImple implements projectDao{
 		// 후원 취소2 (행 삭제)
 		public void donateCancle(int donateNo) {
 			ss.delete("project.cancle", donateNo);
+		}
+		
+		public ProjectVO projectlist(String num) {
+			return ss.selectOne("project.list", num);
+		}
+
+		public List<CategoryVO> categoryLookAround() {
+			return ss.selectList("project.lookaround");
+		}
+		
+		// 프로젝트 댓글 등록
+
+		public void replyInsert(ReplyVO vo) {
+			ss.insert("project.replyInsert", vo);
+		}
+
+		// 댓글 리스트 보여줌
+
+		public List<ReplyVO> replyList(String num) {
+			return ss.selectList("project.replyList", num);
+			
+		}
+		
+		// 모든 프로젝트 리스트
+		public List<ProjectVO> projectALLlist() {
+			
+			return ss.selectList("project.AllList");
 		}
 }

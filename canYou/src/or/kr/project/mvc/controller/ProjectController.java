@@ -18,10 +18,11 @@ import org.springframework.security.authentication.AuthenticationTrustResolver;
 import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,6 +34,7 @@ import or.kr.project.dto.MemberVO;
 import or.kr.project.dto.ProductVO;
 import or.kr.project.dto.ProjectDonateVO;
 import or.kr.project.dto.ProjectVO;
+import or.kr.project.dto.ReplyVO;
 import or.kr.project.mvc.dao.projectDaoImple;
 
 @Controller
@@ -138,7 +140,7 @@ public class ProjectController {
 			
 			prodvo.setProductCnt(Integer.parseInt(pcnt[i]));
 			prodvo.setProductName(pname[i]);
-			prodvo.setProductinfo(pinfo[i]);
+			prodvo.setProductInfo(pinfo[i]);
 			prodvo.setProductCost(Integer.parseInt(pcost[i]));
 			prodvo.setProjectNo(vo.getProjectNo());
 			
@@ -203,23 +205,100 @@ public class ProjectController {
 	 
 	
 	 @RequestMapping("/update")
-		public String updateView() {
-			return "list";
+		public String updateView(Model m, HttpServletRequest req) {
+		 	HttpSession s=req.getSession();
+		 	String str=(String)s.getAttribute("projnum");
+		 	
+		 	ProjectVO vo=dao.modifyview(str);
+		 	m.addAttribute("project", vo);
+		 	
+			return "ProjectModify";
 		}
 
-		@RequestMapping("/list")
-		public String listView(Model m) {
-			List<ProjectVO> list = dao.projectlist();
-			m.addAttribute("list", list);
-			return "detail";
-		}
+	@GetMapping("/list")
+	public String listView(Model m, String num, HttpServletRequest req) {
+		// project 관련한 정보 빼오기
+		ProjectVO list = dao.projectlist(num);
+		m.addAttribute("list",list);
+		
+		// project와 연결된 product 가져오기
+		List<ProductVO> list2=dao.prodsel(num);
+		m.addAttribute("prodlist", list2);
+		
+		// project와 연결된 member 정보 가져오기
+		MemberVO mem=dao.memname2(list.getMemberNo());
+		m.addAttribute("member", mem);
+				
+		//댓글 정보 가져오기
+		List<ReplyVO> replylist = dao.replyList(num);
+		m.addAttribute("replylist", replylist);
+		System.out.println("replylist 크기 : "+ replylist.size());
+		
+		HttpSession s=req.getSession();
+		s.setAttribute("projnum", num);
+		
+		return "detail";
+	}
 
-		// 자신이 올린 프로젝트 수정
-		@RequestMapping("/modify")
-		public String modifyView(ProjectVO vo) {
+		// 프로젝트 수정
+		@PostMapping("/modify")
+		public ModelAndView modifyView(@ModelAttribute("projvo") ProjectVO vo, HttpServletRequest request) {
+			// 프로젝트 수정 - 파일업로드
+			String img_path = "resources\\images";
+			String r_path = request.getRealPath("/");
+			String oriFn = vo.getMultipartFile().getOriginalFilename();
+			StringBuffer projectMainImage = new StringBuffer();
+			projectMainImage.append(r_path).append(img_path).append("\\");
+			projectMainImage.append(oriFn);
+			File f = new File(projectMainImage.toString());
+			System.out.println("projectMainImage : " + projectMainImage);
+			try {
+				vo.getMultipartFile().transferTo(f);
+			} catch (IllegalStateException | IOException e) {
+				e.printStackTrace();
+			}
+			vo.setProjectMainImage(vo.getMultipartFile().getOriginalFilename());
+			
+			// 프로젝트 모두수정 - 메소드 호출
 			dao.modify(vo);
-			return "redirect:/list";
+			ModelAndView mav = new ModelAndView();
+			mav.setViewName("redirect:list");
+			return mav;
 		}
+		
+		//프로젝트 둘러보기
+		@RequestMapping("/lookaround")
+		public String look(Model m) {
+			List<CategoryVO> list = dao.categoryLookAround();
+				
+			m.addAttribute("list", list);
+			
+			return "lookaround";
+		}
+		
+		//모든 프로젝트 둘러보기
+		@RequestMapping("/AllList")
+		public String AllList(Model m) {
+			List<ProjectVO> list = dao.projectALLlist();
+				
+			m.addAttribute("list", list);
+			return "AllList";
+		}
+		
+		// 댓글 등록
+	   @PostMapping("/reply1")
+	   public String reply1(Model m, ReplyVO vo, HttpSession s) {
+		   SecurityContext impl=SecurityContextHolder.getContext();	// 세션에서 spring security 정보를 가져옴
+		   String implstr=impl.getAuthentication().getName();	// security 정보에서 세션에 담겨있는 로그인 정보 중 ID 가져옴
+		   MemberVO vo2=dao.memname(implstr);	// ID를 토대로 회원정보 가져옴 (회원 번호, 회원 이름)
+		   vo.setMemberNo(vo2.getMemberNo());	// 프로젝트 테이블에 넣을 회원 번호를 넣음
+		   vo.setProjectNo(Integer.parseInt((String)s.getAttribute("projnum")));	// 세션에 등록한 projectNumber를 가져옴
+		   s.removeAttribute("projnum");	// 사용한 session 속성 제거
+		   
+		   dao.replyInsert(vo); 
+
+		   return "redirect:list?num="+vo.getProjectNo();
+	   }
 
 		// 마이페이지
 		@RequestMapping(value = "/mylist")

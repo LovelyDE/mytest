@@ -8,9 +8,22 @@
 		select * from category
 	</select>
 	
+	<!-- 둘러보기 -->
+	<select id="lookaround" resultType="cvo">
+		select categoryname
+		from
+		category
+		order by categoryno
+	</select>
+	
 	<!-- 회원 아이디로 회원 번호, 이름을 가져옴 -->
 	<select id="memname" parameterType="String" resultType="mvo">
 		select memberNo, memberName from member where memberId=#{memberId}
+	</select>
+	
+	<!-- 회원 번호로 회원 이름을 가져옴 -->
+	<select id="memname2" parameterType="int" resultType="mvo">
+		select memberId, memberName from member where memberNo=#{memberNo}
 	</select>
 	
 	<!-- 프로젝트 업로드 -->
@@ -19,7 +32,7 @@
 		values(project_seq.nextVal, #{memberNo}, #{projectName}, 
 		#{projectCost}, sysdate, TO_DATE(#{projectEndDate},'yyyy-mm-dd'),
 		 0, #{projectMainImage}, #{projectStory}, 
-		 'Z', 2, #{categoryNo}, 0)
+		 'Z', 2, 0, #{categoryNo})
 		<selectKey keyProperty="projectNo" resultType="int" order="AFTER">
        		SELECT project_seq.CURRVAL FROM dual
     	</selectKey>
@@ -31,15 +44,9 @@
 		values(product_seq.nextVal, #{productName}, #{productCnt}, #{productInfo}, #{productCost}, #{projectNo})
 	</insert>
 	
-		<!-- 리스트 -->
-	<select id="list" resultType="projvo">
-		select projectNo ,memberNo
-		,projectName ,projectCost
-		,projectStartDate,
-		projectEndDate,projectFundCnt,
-		projectMainImage,projectStory,projectStep,projectStatus
-		,categoryNo,
-		projectCurCost from project
+	<!-- 프로젝트의 상품 목록 가져오기 -->
+	<select id="prodsel" parameterType="String" resultType="prodvo">
+		select * from product where projectNo=#{projectNo}
 	</select>
 	
 	<!-- 마이페이지 후원 목록 리스트 -->
@@ -55,12 +62,6 @@
 		from projectdonate
 		where memberno=#{num})
 	</select>
-
-	<!-- 수정 -->
-	<update id="modify" parameterType="projvo" timeout="20">
-		update project SET projectName = #{projectName} , projectCost = #{projectCost} , projectMainImage =
-		#{projectMainImage} , projectStory = #{projectStory} WHERE projectNo=1
-	</update>
 	
 	<!-- 후원 추가 1 (행 추가) -->
 	<insert id="donate" parameterType="dvo">
@@ -107,4 +108,44 @@
 		where memberNo=#{memberNo}
 	</select>
 	
+		<!-- 리스트 -->
+	<select id="list" parameterType="String" resultType="projvo">
+		select projectNo ,memberNo
+		,projectName ,projectCost
+		,projectStartDate,
+		projectEndDate,projectFundCnt,
+		projectMainImage,projectStory,projectStep,projectStatus
+		,categoryNo,
+		projectCurCost from project where projectNo=#{projectNo}
+	</select>
+	
+	<!-- 수정 폼 view -->
+	<select id="modifyview" parameterType="String" resultType="projvo">
+		select projectName, projectMainImage, projectStory from project where projectNo=#{projectNo}
+	</select>
+	
+	<!-- 수정 -->
+	<update id="modify" parameterType="projvo" timeout="20">
+		update project SET projectName = #{projectName} , projectCost = #{projectCost} , projectMainImage =
+		#{projectMainImage} , projectStory = #{projectStory} WHERE projectNo=1
+	</update>
+
+	<!-- 댓글 등록하기 -->
+	<insert id="replyInsert" parameterType="replyvo">
+		insert into reply values(
+		reply_seq.nextVal,#{replyContent},sysdate,
+		#{projectNo},#{memberNo}
+		)
+	</insert>
+	<!-- 댓글 리스트 -->
+	<select id="replyList" parameterType="String" resultType="replyvo">
+		select replyContent,replyDate, memberNo
+		from reply
+		where projectNo=#{projectNo}
+		order by replyDate
+	</select>
+	<select id="AllList" resultType="projvo">
+		select projectNo, projectMainImage, projectName
+		, projectCurCost, projectEndDate from project
+	</select>
 </mapper>
