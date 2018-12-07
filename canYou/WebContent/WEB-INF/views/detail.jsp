@@ -12,7 +12,17 @@
 <meta charset="EUC-KR">
 <title>detail.jsp</title>
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-
+<script>
+$(document).ready(function(){
+	$('.prodview #donadd').each(function(){
+		$(this).click(function(e){
+			//console.log($(this).prev().html());
+			$('#selprod').html($(this).prev().html());
+			$('#selprod').css('border', '1px pink solid');
+		});
+	});
+}); 
+</script>
 </head>
 <body>
 <div>
@@ -65,17 +75,28 @@
 							<td>카테고리 번호 : ${list.categoryNo}</td>
 						</tr>
 						<tr>
-						<td>
-
+							<td>
 								<c:forEach var="e2" items="${prodlist}">
-									<div style="border:1px solid gold;">
-									<p>${e2.productCost }원 이상 구매 시</p>
-									<h2>${e2.productName }</h2>
-									<p>${e2.productInfo }</p>
-									<p>${e2.productCnt }개 남음</p>
+									<div class="prodview" style="border:1px solid gold;">
+										<div>
+											<input type="hidden" name="productNo" id="productNo" value="${e2.productNo }">
+											<p>${e2.productCost }원 이상 구매 시</p>
+											<h2>${e2.productName }</h2>
+											<p>${e2.productInfo }</p>
+											<p>${e2.productCnt }개 남음</p>
+										</div>
+									<input id="donadd" type="button" value="이걸로 후원하기">
 									</div>
 								</c:forEach>
-						</td>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<h2>현재 선택중인 선물</h2>
+								<div id="selprod">
+									
+								</div>
+							</td>
 						</tr>
 						<tr>
 							<td>추가 후원 : <input type="text" name="donateMoney" id="donateMoney"></td>
@@ -141,10 +162,12 @@
 				if (result) {
 					var projectNo = $('#projectNo').val();
 					var donateMoney = $('#donateMoney').val();
+					var productNo = $('#selprod #productNo').val();
 					
-					console.log("projectNo : "+projectNo+"/ donateMoney : "+donateMoney);
 					
-					location.href ='donate?projectNo='+projectNo+'&donateMoney='+donateMoney;
+					console.log("projectNo : "+projectNo+"/ donateMoney : "+donateMoney+"/ productNo:" + productNo);
+					
+					//location.href ='donate?projectNo='+projectNo+'&donateMoney='+donateMoney;
 				}
 			});
 		});
