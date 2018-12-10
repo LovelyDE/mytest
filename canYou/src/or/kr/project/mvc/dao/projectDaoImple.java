@@ -14,6 +14,7 @@ import or.kr.project.dto.ProductVO;
 import or.kr.project.dto.ProjectDonateVO;
 import or.kr.project.dto.ProjectVO;
 import or.kr.project.dto.ReplyVO;
+import or.kr.project.dto.SearchVO;
 
 
 @Repository
@@ -115,9 +116,13 @@ public class projectDaoImple implements projectDao{
 			
 		}
 		
-		// 모든 프로젝트 리스트
-		public List<ProjectVO> projectALLlist() {
+		// 모든 프로젝트 둘러보기 -페이징 처리
+		public List<ProjectVO> projectALLlist(SearchVO vo) {
+			return ss.selectList("paging.AllList", vo);
+		}
+		// 모든 프로젝트 총 개수
+		public int getTotalCount() {
+			return ss.selectOne("paging.listTotal");
 			
-			return ss.selectList("project.AllList");
 		}
 }

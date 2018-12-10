@@ -147,8 +147,4 @@
 		where projectNo=#{projectNo}
 		order by replyDate
 	</select>
-	<select id="AllList" resultType="projvo">
-		select projectNo, projectMainImage, projectName
-		, projectCurCost, projectEndDate from project
-	</select>
 </mapper>

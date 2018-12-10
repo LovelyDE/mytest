@@ -5,6 +5,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.security.Principal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,10 +36,12 @@ import org.springframework.web.servlet.ModelAndView;
 
 import or.kr.project.dto.CategoryVO;
 import or.kr.project.dto.MemberVO;
+import or.kr.project.dto.PageVO;
 import or.kr.project.dto.ProductVO;
 import or.kr.project.dto.ProjectDonateVO;
 import or.kr.project.dto.ProjectVO;
 import or.kr.project.dto.ReplyVO;
+import or.kr.project.dto.SearchVO;
 import or.kr.project.mvc.dao.projectDaoImple;
 
 @Controller
@@ -277,14 +284,114 @@ public class ProjectController {
 			return "lookaround";
 		}
 		
-		//모든 프로젝트 둘러보기
-		@RequestMapping("/AllList")
-		public String AllList(Model m) {
-			List<ProjectVO> list = dao.projectALLlist();
-				
-			m.addAttribute("list", list);
-			return "AllList";
+		// 모든 프로젝트 보기
+		@RequestMapping(value="/AllList")
+		public ModelAndView AllList(Integer page, SearchVO vo,Principal principal) {
+			
+			 // pageVO의 획득
+			  int totalRows = dao.getTotalCount();
+			  PageVO pageInfo = makePageVO(page, totalRows);
+
+			  // 보여줄 페이지 설정
+			  vo.setBegin(String.valueOf(pageInfo.getStartRow()));
+			  vo.setEnd(String.valueOf(pageInfo.getEndRow()));
+			  
+			List<ProjectVO> list = dao.projectALLlist(vo);
+			
+			System.out.println(list.size());
+			ModelAndView mav = new ModelAndView();
+			mav.setViewName("AllList");
+			mav.addObject("list", list);
+			mav.addObject("pageInfo", pageInfo);
+			if(principal != null)
+			mav.addObject("principal", principal.getName());
+			List<String> dateList = new ArrayList<String>();
+			
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+
+			// 남은 날짜 계산해서 list에 넣어 줌
+			for (ProjectVO pvo : list) {
+				String sys = format.format(new Date()); // 현재 날짜
+
+				int idx = pvo.getProjectEndDate().indexOf(" ");
+				String end = pvo.getProjectEndDate().substring(0, idx); // 끝나는 날짜
+
+				Date endDate = null;
+				Date sysdate = null;
+				long diffDays = 0;
+				try {
+					// 날짜 계산을 위해 Date형으로 변환
+					endDate = format.parse(end);
+					sysdate = format.parse(sys);
+
+					// 시간차이를 시간,분,초를 곱한 값으로 나누면 하루 단위가 나옴
+					long diff = endDate.getTime() - sysdate.getTime();
+					diffDays = diff / (24 * 60 * 60 * 1000);
+
+					System.out.println("날짜차이=" + diffDays);
+
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+
+				dateList.add(Integer.toString((int) diffDays)); // 리스트에 날짜 차이를 넣음
+
+			}
+			mav.addObject("dateList", dateList);
+			
+			
+			return mav;
 		}
+		
+		// makePageVO 메소드(페이지를 만들어주는 메소드)
+		public PageVO makePageVO(Integer page, int totalRows) {
+			  
+			  PageVO pageInfo = new PageVO();
+			  int rowsPerPage = 9; // 한페이지당 보여줄 목록수 - properties
+			  int pagesPerBlock = 5; // 한 블록당 보여줄 페이지 수 - properties
+			  if (page == null) page = 0;
+			  if(page  == 0) page = 1; //페이지 초기화
+			  int currentPage = page; // 현재 페이지 값
+			  int currentBlock = 0; // 현재 블록 초기화
+			  if (currentPage % pagesPerBlock == 0) { // 현재 블록 초기값
+			   currentBlock = currentPage / pagesPerBlock;
+			  } else { // 다음 블록이냐
+			   currentBlock = currentPage / pagesPerBlock + 1;
+			  }
+			  int startRow = (currentPage - 1) * rowsPerPage + 1; // 시작목록값연산
+			  int endRow = currentPage * rowsPerPage;// 마지막 목록값 연산
+
+			  
+			  // 전체 데이터 값
+			  
+			  System.out.println("totalRows:" + totalRows);
+			  // 전체 페이지 구하는 공식
+			  int totalPages = 0;
+			  if (totalRows % rowsPerPage == 0) {
+			   totalPages = totalRows / rowsPerPage;
+			  } else {
+			   totalPages = totalRows / rowsPerPage + 1;
+			  }
+			  // 전체 블록값을 구하는 공식
+			  int totalBlocks = 0;
+			  if (totalPages % pagesPerBlock == 0) {
+			   totalBlocks = totalPages / pagesPerBlock;
+			  } else {
+			   totalBlocks = totalPages / pagesPerBlock + 1;
+			  }
+			  // 모든 연산된정보를 PageVO에 저장한다.
+			  pageInfo.setCurrentPage(currentPage);
+			  pageInfo.setCurrentBlock(currentBlock);
+			  pageInfo.setRowsPerPage(rowsPerPage);
+			  pageInfo.setPagesPerBlock(pagesPerBlock);
+			  pageInfo.setStartRow(startRow);
+			  pageInfo.setEndRow(endRow);
+			  pageInfo.setTotalRows(totalRows);
+			  pageInfo.setTotalPages(totalPages);
+			  pageInfo.setTotalBlocks(totalBlocks);
+			  
+			  return pageInfo;
+			 }
 		
 		// 댓글 등록
 	   @PostMapping("/reply1")

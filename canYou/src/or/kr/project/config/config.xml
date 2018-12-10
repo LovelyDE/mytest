@@ -11,5 +11,6 @@
 		<typeAlias alias="replyvo" type="or.kr.project.dto.ReplyVO"/>
 		<typeAlias alias="hvo" type="or.kr.project.dto.HashtagVO"/>
 		<typeAlias alias="dvo" type="or.kr.project.dto.ProjectDonateVO" />
+		<typeAlias alias="searchvo" type="or.kr.project.dto.SearchVO"  />
 	</typeAliases>
 </configuration>
