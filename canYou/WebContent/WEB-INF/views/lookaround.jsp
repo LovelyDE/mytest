@@ -12,10 +12,14 @@
 
 <h1><a href="AllList">모든 프로젝트</a></h1>
 <h2>카테고리 별 보기</h2>
-	<c:forEach var="e" items="${list}">
-		<tr>
-			<td><h3><a href="list">▶${e.categoryName}</a></h3></td>
-		</tr>
-	</c:forEach>
+<table>
+<c:forEach var="e" items="${list}" varStatus="idx">
+      <tr>
+         <td>
+         <a href="categoryproject?categoryNo=${idx.index+1}">▶${e.categoryName}</a>
+         </td>
+      </tr>
+   </c:forEach>
+  </table>
 </body>
 </html>

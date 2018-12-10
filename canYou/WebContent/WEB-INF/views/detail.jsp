@@ -52,6 +52,9 @@ $(document).ready(function(){
 							<td>프로젝트 마감날짜 : ${list.projectEndDate}</td>
 						</tr>
 						<tr>
+							<td>모인 후원 금액: ${list.projectCurCost}</td>
+						</tr>
+						<tr>
 							<td>후원자 수 : ${list.projectFundCnt}</td>
 						</tr>
 						<tr>

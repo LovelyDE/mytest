@@ -85,6 +85,33 @@ public class ProjectController {
 		return "error500";
 	}
 	
+	@RequestMapping(value = "/mypage")
+	public String getDonateList() {
+		return "mypage";
+	}
+	
+	//개인정보 수정 페이지로 이동
+	@RequestMapping(value="/editinfo")
+	public String editInfo(Model m) {
+		return "editinfo";
+	}
+	
+	//개인정보 수정 하기
+	@RequestMapping(value="/success")
+	public String editSuccess(Model m,MemberVO vo) {
+		// 세션에서 로그인 된 ID를 가져오는 작업
+		SecurityContext impl=SecurityContextHolder.getContext();
+		String implstr=impl.getAuthentication().getName(); 
+		// 끝-------------------
+		MemberVO vo2=dao.memname(implstr);	// 가져온 ID를 토대로 회원 번호, 이름을 가져온다
+		vo.setMemberNo(vo2.getMemberNo());
+		
+		
+		dao.editMyInfo(vo);
+		
+		return "success";
+	}
+	
 	@RequestMapping(value="/proupform")		// 프로젝트 업로드 폼 페이지
 	public ModelAndView proupform(HttpServletRequest request){
 		List<CategoryVO> category=dao.casel();		// 프로젝트 업로드에 필요한 카테고리 목록을 가져옴
@@ -343,6 +370,76 @@ public class ProjectController {
 			return mav;
 		}
 		
+		//카테고리별 프로젝트 보기
+		@RequestMapping(value="/categoryproject")
+		public String categoryProject(Model m,@RequestParam("categoryNo")String categoryNo,
+				Integer page, SearchVO svo,Principal principal) {
+			
+			// pageVO의 획득
+			int totalRows = dao.getCategoryCount(Integer.parseInt(categoryNo));
+			PageVO pageInfo = makePageVO(page, totalRows);
+			  
+			// 보여줄 페이지 설정
+			svo.setBegin(String.valueOf(pageInfo.getStartRow()));
+			svo.setEnd(String.valueOf(pageInfo.getEndRow()));
+			
+			List<String> dateList = new ArrayList<String>(); //남은 날짜 리스트
+			
+			//무슨 카테고리인지 전달
+			Map<String, String> categoryList = new HashMap<>(); 
+			categoryList.put("categoryNo", categoryNo);
+			categoryList.put("begin", String.valueOf(pageInfo.getStartRow()));
+			categoryList.put("end", String.valueOf(pageInfo.getEndRow()));
+			m.addAttribute("categoryNo", categoryNo);
+			
+			List<ProjectVO> list = dao.lookCategoryProject(categoryList); //리스트 얻음	
+			m.addAttribute("list", list);
+			m.addAttribute("pageInfo", pageInfo); // pageInfo 전달		
+
+			System.out.println("categoryNo : " +categoryNo);
+			System.out.println("list size2 : "+list.size());
+
+			if (principal != null) {
+				m.addAttribute("principal", principal.getName());
+			}
+			
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd"); 
+			
+			//남은 날짜 계산해서 list에 넣어 줌
+			for(ProjectVO pvo : list) {
+				String sys = format.format(new Date()); //현재 날짜
+				
+				int idx = pvo.getProjectEndDate().indexOf(" "); 
+				String end = pvo.getProjectEndDate().substring(0,idx); //끝나는 날짜
+
+				Date endDate = null;
+				Date sysdate = null;
+				long diffDays = 0;
+				
+				try {
+					//날짜 계산을 위해 Date형으로 변환
+					endDate = format.parse(end);
+					sysdate = format.parse(sys);
+					
+					// 시간차이를 시간,분,초를 곱한 값으로 나누면 하루 단위가 나옴
+			        long diff = endDate.getTime() - sysdate.getTime();
+			        diffDays = diff / (24 * 60 * 60 * 1000);
+			 
+			        System.out.println("날짜차이=" + diffDays);
+			        
+			        //dateList.add(diffDays);
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+
+				dateList.add(Integer.toString((int) diffDays)); //리스트에 날짜 차이를 넣음
+				
+			}
+			m.addAttribute("dateList", dateList);
+			
+			return "categoryproject";
+		}
+		
 		// makePageVO 메소드(페이지를 만들어주는 메소드)
 		public PageVO makePageVO(Integer page, int totalRows) {
 			  
@@ -408,7 +505,7 @@ public class ProjectController {
 		   return "redirect:list?num="+vo.getProjectNo();
 	   }
 
-		// 마이페이지
+		/*// 마이페이지
 		@RequestMapping(value = "/mylist")
 		public String getDonateList(Model m) {
 			SecurityContext impl=SecurityContextHolder.getContext();	// 세션에서 spring security 정보를 가져옴
@@ -419,48 +516,77 @@ public class ProjectController {
 			System.out.println(list.size());
 			m.addAttribute("list", list);
 			return "mypage";
-		}
+		}*/
 
-		// 후원할때 들어오는 메소드
-		@RequestMapping(value = "/donate")
-		public String donateProject(ProjectDonateVO vo) {
-			SecurityContext impl=SecurityContextHolder.getContext();	// 세션에서 spring security 정보를 가져옴
-			String implstr=impl.getAuthentication().getName();	// security 정보에서 세션에 담겨있는 로그인 정보 중 ID 가져옴
-			MemberVO vo2=dao.memname(implstr);	// ID를 토대로 회원정보 가져옴 (회원 번호, 회원 이름)
-			int memno = vo2.getMemberNo();
-			
-			
-			vo.setMemberNo(memno);
-			
-			vo.setDonateMoney(vo.getDonateMoney()+dao.prodcost(vo.getProductNo()));
-			dao.donate(vo); //projectDonate 행 추가
-			
-			// 돈 차감
-			Map<String, Integer> m = new HashMap<>();
-			m.put("donateMoney", vo.getDonateMoney());
-			m.put("memberNo", memno);
-			
-			dao.donateMoney(m);
-			
-			return "redirect:/mylist";
-		}
+	// 후원할때 들어오는 메소드
+	@RequestMapping(value = "/donate")
+	public String donateProject(ProjectDonateVO vo) {
+		SecurityContext impl=SecurityContextHolder.getContext();	// 세션에서 spring security 정보를 가져옴
+		String implstr=impl.getAuthentication().getName();	// security 정보에서 세션에 담겨있는 로그인 정보 중 ID 가져옴
+		MemberVO vo2=dao.memname(implstr);	// ID를 토대로 회원정보 가져옴 (회원 번호, 회원 이름)
+		int memno = vo2.getMemberNo();
+		
+		
+		vo.setMemberNo(memno);
+		vo.setDonateMoney(vo.getDonateMoney()+dao.prodcost(vo.getProductNo()));
+		
+		dao.donate(vo); //projectDonate 행 추가
+		
+		// 돈 차감
+		Map<String, Integer> m = new HashMap<>();
+		m.put("donateMoney", vo.getDonateMoney());
+		m.put("memberNo", memno);
+		
+		dao.donateMoney(m);
+		
+		return "redirect:/list?num="+vo.getProjectNo();
+	}
 
-		// 후원 취소
-		@RequestMapping(value = "/cancle")
-		public String cancle(int donateNo/*이후에 프로젝트 선택해서 할 경우를 대비해서*/) {
-			SecurityContext impl=SecurityContextHolder.getContext();	// 세션에서 spring security 정보를 가져옴
-			String implstr=impl.getAuthentication().getName();	// security 정보에서 세션에 담겨있는 로그인 정보 중 ID 가져옴
-			MemberVO vo2=dao.memname(implstr);	// ID를 토대로 회원정보 가져옴 (회원 번호, 회원 이름)
-			int memno = vo2.getMemberNo();
+	// 후원 취소
+	@RequestMapping(value = "/cancle")
+	public String cancle(int donateNo/*이후에 프로젝트 선택해서 할 경우를 대비해서*/) {
+		SecurityContext impl=SecurityContextHolder.getContext();	// 세션에서 spring security 정보를 가져옴
+		String implstr=impl.getAuthentication().getName();	// security 정보에서 세션에 담겨있는 로그인 정보 중 ID 가져옴
+		MemberVO vo2=dao.memname(implstr);	// ID를 토대로 회원정보 가져옴 (회원 번호, 회원 이름)
+		int memno = vo2.getMemberNo();
+		
+		ProjectDonateVO vo = new ProjectDonateVO();
+		vo.setDonateNo(donateNo);
+		vo.setMemberNo(memno);
+		
+		// 사용자의 돈을 반환
+		dao.returnMoney(vo);
+		// 돈 돌려 준 후에 행 삭제
+		dao.donateCancle(vo);
+		return "redirect:/AllList"; // 다시 리스트 화면으로
+	}
+	
+	// 내 후원현황
+	@RequestMapping("/mydonate")
+	public String mydonate(Model m) {
+		SecurityContext impl=SecurityContextHolder.getContext();	// 세션에서 spring security 정보를 가져옴
+		String implstr=impl.getAuthentication().getName();	// security 정보에서 세션에 담겨있는 로그인 정보 중 ID 가져옴
+		MemberVO vo2=dao.memname(implstr);	// ID를 토대로 회원정보 가져옴 (회원 번호, 회원 이름)
+		int memno = vo2.getMemberNo();
+		
+		List<HashMap> list = dao.myDonateProject(memno);
+		System.out.println(list.size());
+		m.addAttribute("list", list);
 			
-			ProjectDonateVO vo = new ProjectDonateVO();
-			vo.setDonateNo(donateNo);
-			vo.setMemberNo(memno);
-			
-			// 사용자의 돈을 반환
-			dao.returnMoney(vo);
-			// 돈 돌려 준 후에 행 삭제
-			dao.donateCancle(vo);
-			return "redirect:/AllList"; // 다시 리스트 화면으로
-		}
+		return "mydonate";
+	}
+	
+	// 내가 만든 프로젝트
+	@RequestMapping("/myProject")
+	public String moveMyProject(Model m) {
+		SecurityContext impl=SecurityContextHolder.getContext();	// 세션에서 spring security 정보를 가져옴
+		String implstr=impl.getAuthentication().getName();	// security 정보에서 세션에 담겨있는 로그인 정보 중 ID 가져옴
+		MemberVO vo2=dao.memname(implstr);	// ID를 토대로 회원정보 가져옴 (회원 번호, 회원 이름)
+		int memno = vo2.getMemberNo();
+		
+		List<ProjectVO> list = dao.myProjectlist(memno);
+		m.addAttribute("list", list);
+		   
+		return "myProject";
+	}
 }

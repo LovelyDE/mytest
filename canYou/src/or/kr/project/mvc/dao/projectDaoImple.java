@@ -66,8 +66,11 @@ public class projectDaoImple implements projectDao{
 		
 		// 프로젝트에 후원을 하는 메소드2
 		public void donate(ProjectDonateVO vo) {
-			ss.insert("project.donate", vo);
-			ss.update("project.prodput", vo);
+			ss.insert("project.donate", vo);	// 후원
+			ss.update("project.prodput", vo);	// 상품을 빼냄
+			
+			ss.update("project.projectFundCnt", vo);	// 프로젝트의 카운트 수를 하나 늘림
+			ss.update("project.projectCurCost",vo);		// 프로젝트의 모인 금액을 올림
 		}
 
 
@@ -124,5 +127,34 @@ public class projectDaoImple implements projectDao{
 		public int getTotalCount() {
 			return ss.selectOne("paging.listTotal");
 			
+		}
+		
+		//마이페이지 - 내가만든 프로젝트 리스트
+		public List<ProjectVO> myProjectlist(int num) {
+			return ss.selectList("project.myProjectlist", num);
+		}
+		
+		// 마이페이지-개인정보 수정
+		public void editMyInfo(MemberVO vo) {
+			ss.update("project.editinfo",vo);
+		}
+		
+		//카테고리별 프로젝트의 수 구하기
+		public int getCategoryCount(int categoryNo) {
+			return ss.selectOne("paging.listCategory",categoryNo);
+		}
+
+		//카테고리별 프로젝트 보기
+		public List<ProjectVO> lookCategoryProject(Map<String, String> categoryList) {
+			System.out.println("-----------------------------");
+			System.out.println(categoryList.get("categoryNo"));
+			System.out.println(categoryList.get("begin"));
+			System.out.println(categoryList.get("end"));
+			System.out.println("-----------------------------");
+			
+			List<ProjectVO> list = ss.selectList("paging.paginglist",categoryList);
+			System.out.println("list size : "+list.size());
+			
+			return list;
 		}
 }

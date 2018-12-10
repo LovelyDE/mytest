@@ -55,6 +55,31 @@
 		where d.projectNo=p.projectNo and d.memberNo=#{memberNo}
 	</select>
 	
+	<!-- 마이페이지 내가 만든 프로젝트 리스트 -->
+	<select id="myProjectlist" parameterType="int" resultType="projvo">
+		select projectNo, memberNo, projectName, projectCost, projectStartDate,
+				projectEndDate, projectFundCnt, projectMainImage,projectStory,
+				projectStep, projectStatus, categoryNo, projectCurCost 
+		from project
+		where memberNo=#{memberNo}
+	</select>	
+	
+	<!-- 개인정보 수정 -->
+	<update id="editinfo" parameterType="mvo">
+		update member
+		 <trim prefix="SET" suffixOverrides=",">
+		    <if test="memberPwd != null">memberPwd=#{memberPwd},</if>
+		    <if test="memberName != null">memberName=#{memberName},</if>
+		    <if test="memberAddr != null">memberAddr=#{memberAddr},</if>
+		    <if test="memberPhone != null">memberPhone=#{memberPhone},</if>
+		    <if test="memberEmail != null">memberEmail=#{memberEmail},</if>
+		    <if test="memberAge != null">memberAge=#{memberAge},</if>
+		    <if test="memberAccount != null">memberAccount=#{memberAccount},</if>
+		    <if test="memberImage != null">memberImage=#{memberImage},</if>
+	    </trim>
+		where memberNo=#{memberNo}
+	</update>
+	
 	<!-- 상품 가격 가져오기 -->
 	<select id="prodcost" parameterType="int" resultType="int">
 		select productCost from product where productNo=#{productNo}
@@ -88,6 +113,19 @@
 		update member
 		set memberCash = memberCash - #{donateMoney}
 		where memberNo=#{memberNo}
+	</update>
+	
+	<!-- 후원 추가 (후원자 수 증가) -->
+	<update id="projectFundCnt" parameterType="dvo">
+		update project
+		set projectFundCnt=projectFundCnt+1
+		where projectNo=#{projectNo}
+	</update>
+	
+	<!-- 후원 추가(모인 금액 업데이트)-->
+	<update id="projectCurCost" parameterType="dvo">
+		update project set projectCurCost=projectCurCost+#{donateMoney}
+        where projectNo=#{projectNo}
 	</update>
 	
 	<!-- 후원 취소2 (행 삭제) : 세션에서 가져온 회원 번호와 후원 번호가 일치해야 삭제가 됨 -->

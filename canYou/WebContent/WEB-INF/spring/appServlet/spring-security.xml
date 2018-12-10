@@ -20,6 +20,11 @@ access-decision-manager-ref="accessDecisionManager">
 	<intercept-url pattern="/mylist" access="1,2"/>
 	<intercept-url pattern="/donate" access="1,2"/>
 	<intercept-url pattern="/cancle" access="1,2"/>
+	<intercept-url pattern="/mypage" access="1,2"/>
+	<intercept-url pattern="/mydonate" access="1,2"/>
+	<intercept-url pattern="/myProject" access="1,2"/>
+	<intercept-url pattern="/editinfo" access="1,2"/>
+	
 <!--<intercept-url pattern="/bbs1detail" access="User"/> -->
 <!--<intercept-url pattern="/bbs1Form" access="User"/>-->
 	<form-login login-page="/login"

@@ -10,43 +10,12 @@
 </head>
 <body>
 	<fieldset>
-	<legend> 마이 페이지 </legend>
-	<legend> 내가 투자한 프로젝트 </legend>
-		<table border="1">
-			<thead>
-			<c:forEach items="${list}" var="listv">
-				<tr>
-					<td>
-						${listv.DONATEDAY }
-					</td>
-					<td>프로젝트 : ${listv.PROJECTNAME}
-					</td>
-					<td>
-						후원 금액 : ${listv.DONATEMONEY }
-					</td>
-					<td>
-					<input id="donateNo" type="hidden" value="${listv.DONATENO}">
-					<input type="button" class="deleteBtn" value="기부 취소">
-					</td>
-				</tr>
-			</c:forEach>
-			</thead>
-		</table>
+	<h2>마이페이지</h2>
+	<p><a href="mydonate">내 후원 현황</a></p>
+	<p><a href="myProject">내가 만든 프로젝트</a></p>
+	<p><a href="editinfo">개인정보 수정</a></p>
+	<p><a href="">로그아웃</a></p>
 	</fieldset>
 </body>
-
-<script>
-$(function(){
-	$('.deleteBtn').each(function(index, item) { 
-		$(this).click(function(){
-			var result = confirm('삭제하시겠습니까?');
-			
-			if(result){
-				location.href='cancle?donateNo='+$(this).prev().val();
-			}
-		});
-	});
-});
-</script>
 
 </html>
