@@ -2,7 +2,7 @@ package or.kr.project.dto;
 
 public class ProjectDonateVO {
 	int donateNo, memberNo, projectNo, productNo, donateMoney;
-	String payOption;
+	String payOption, donateDay;
 	public int getDonateNo() {
 		return donateNo;
 	}

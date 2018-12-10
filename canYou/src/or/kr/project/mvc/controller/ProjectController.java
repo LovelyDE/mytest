@@ -128,6 +128,7 @@ public class ProjectController {
 			}
 		}
 		
+		/* 로그인 정보를 가져오는 구문 */
 		SecurityContext impl=SecurityContextHolder.getContext();	// 세션에서 spring security 정보를 가져옴
 		String implstr=impl.getAuthentication().getName();	// security 정보에서 세션에 담겨있는 로그인 정보 중 ID 가져옴
 		MemberVO vo2=dao.memname(implstr);	// ID를 토대로 회원정보 가져옴 (회원 번호, 회원 이름)
@@ -204,16 +205,16 @@ public class ProjectController {
 	 }
 	 
 	
-	 @RequestMapping("/update")
-		public String updateView(Model m, HttpServletRequest req) {
-		 	HttpSession s=req.getSession();
-		 	String str=(String)s.getAttribute("projnum");
+	@RequestMapping("/update")
+	public String updateView(Model m, HttpServletRequest req) {
+		 HttpSession s=req.getSession();
+		 String str=(String)s.getAttribute("projnum");
 		 	
-		 	ProjectVO vo=dao.modifyview(str);
-		 	m.addAttribute("project", vo);
+		 ProjectVO vo=dao.modifyview(str);
+		 m.addAttribute("project", vo);
 		 	
-			return "ProjectModify";
-		}
+		return "ProjectModify";
+	}
 
 	@GetMapping("/list")
 	public String listView(Model m, String num, HttpServletRequest req) {
@@ -307,7 +308,7 @@ public class ProjectController {
 			String implstr=impl.getAuthentication().getName();	// security 정보에서 세션에 담겨있는 로그인 정보 중 ID 가져옴
 			MemberVO vo2=dao.memname(implstr);	// ID를 토대로 회원정보 가져옴 (회원 번호, 회원 이름)
 			
-			List<ProjectVO> list = dao.myDonateProject(vo2.getMemberNo());
+			List<HashMap> list = dao.myDonateProject(vo2.getMemberNo());
 			System.out.println(list.size());
 			m.addAttribute("list", list);
 			return "mypage";
@@ -324,6 +325,7 @@ public class ProjectController {
 			
 			vo.setMemberNo(memno);
 			
+			vo.setDonateMoney(vo.getDonateMoney()+dao.prodcost(vo.getProductNo()));
 			dao.donate(vo); //projectDonate 행 추가
 			
 			// 돈 차감
@@ -331,23 +333,27 @@ public class ProjectController {
 			m.put("donateMoney", vo.getDonateMoney());
 			m.put("memberNo", memno);
 			
-			dao.donateMoney(m); 
+			dao.donateMoney(m);
 			
 			return "redirect:/mylist";
 		}
 
 		// 후원 취소
 		@RequestMapping(value = "/cancle")
-		public String cancle(int projectNo/*이후에 프로젝트 선택해서 할 경우를 대비해서*/) {
+		public String cancle(int donateNo/*이후에 프로젝트 선택해서 할 경우를 대비해서*/) {
 			SecurityContext impl=SecurityContextHolder.getContext();	// 세션에서 spring security 정보를 가져옴
 			String implstr=impl.getAuthentication().getName();	// security 정보에서 세션에 담겨있는 로그인 정보 중 ID 가져옴
 			MemberVO vo2=dao.memname(implstr);	// ID를 토대로 회원정보 가져옴 (회원 번호, 회원 이름)
 			int memno = vo2.getMemberNo();
 			
+			ProjectDonateVO vo = new ProjectDonateVO();
+			vo.setDonateNo(donateNo);
+			vo.setMemberNo(memno);
+			
 			// 사용자의 돈을 반환
-			dao.returnMoney(memno);
+			dao.returnMoney(vo);
 			// 돈 돌려 준 후에 행 삭제
-			dao.donateCancle(memno);
-			return "redirect:/list"; // 다시 리스트 화면으로
+			dao.donateCancle(vo);
+			return "redirect:/AllList"; // 다시 리스트 화면으로
 		}
 }

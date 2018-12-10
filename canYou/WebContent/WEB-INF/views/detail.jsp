@@ -165,9 +165,9 @@ $(document).ready(function(){
 					var productNo = $('#selprod #productNo').val();
 					
 					
-					console.log("projectNo : "+projectNo+"/ donateMoney : "+donateMoney+"/ productNo:" + productNo);
+					//console.log("projectNo : "+projectNo+"/ donateMoney : "+donateMoney+"/ productNo:" + productNo);
 					
-					//location.href ='donate?projectNo='+projectNo+'&donateMoney='+donateMoney;
+					location.href ='donate?projectNo='+projectNo+'&donateMoney='+donateMoney+'&productNo='+productNo;
 				}
 			});
 		});

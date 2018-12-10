@@ -16,10 +16,18 @@
 			<thead>
 			<c:forEach items="${list}" var="listv">
 				<tr>
-					<td>프로젝트 : ${listv.projectName}
-					<input id="projectNo" type="hidden" value="${listv.projectNo}">
+					<td>
+						${listv.DONATEDAY }
 					</td>
-					<td><input type="button" class="deleteBtn" value="기부 취소"></td>
+					<td>프로젝트 : ${listv.PROJECTNAME}
+					</td>
+					<td>
+						후원 금액 : ${listv.DONATEMONEY }
+					</td>
+					<td>
+					<input id="donateNo" type="hidden" value="${listv.DONATENO}">
+					<input type="button" class="deleteBtn" value="기부 취소">
+					</td>
 				</tr>
 			</c:forEach>
 			</thead>
@@ -34,7 +42,7 @@ $(function(){
 			var result = confirm('삭제하시겠습니까?');
 			
 			if(result){
-				location.href='cancle?projectNo='+$('#projectNo').val();
+				location.href='cancle?donateNo='+$(this).prev().val();
 			}
 		});
 	});

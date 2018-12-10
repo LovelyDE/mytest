@@ -53,6 +53,10 @@ public class projectDaoImple implements projectDao{
 			ss.update("project.modify", vo);
 		}
 		
+		public int prodcost(int i) {
+			return ss.selectOne("project.prodcost", i);
+		}
+		
 		//프로젝트에 후원하는 메소드 1 (돈 차감)
 		public void donateMoney(Map<String, Integer> m) {
 			ss.update("project.donateMoney", m);
@@ -62,41 +66,32 @@ public class projectDaoImple implements projectDao{
 		// 프로젝트에 후원을 하는 메소드2
 		public void donate(ProjectDonateVO vo) {
 			ss.insert("project.donate", vo);
+			ss.update("project.prodput", vo);
 		}
 
 
 		// 마이 페이지에서 자신이 투자한 프로젝트의 목록을 가져오는 메소드
-		public List<ProjectVO> myDonateProject(int num /* num은 회원의 멤버 번호 */) {
+		public List<HashMap> myDonateProject(int num /* num은 회원의 멤버 번호 */) {
 			System.out.println("들어온 넘버 값:" + num);
-			List<ProjectVO> list = ss.selectList("project.mydonate", num);
+			List<HashMap> list = ss.selectList("project.mydonate", num);
 			return list;
 		}
 
-		// 후원 취소1 (돈 반환) 현재는 일괄 취소해서 일괄로 반환
-		public void returnMoney(int memberNo /*임의값*/) {
+		// 후원 취소1 (돈 반환)
+		public void returnMoney(ProjectDonateVO vo) {
 			Map<String, Integer> m = new HashMap<>();
-			// 돈을 반환 하기 전에 일괄 취소해서 나오는 금액을 찾기 위한 변수
-			int total=0;
-			System.out.println("total 계산까지 옴");
-			//자신이 후원한 목록을 반환 리스트
-			List<ProjectDonateVO> list = ss.selectList("project.mydonatelist",memberNo);
-			System.out.println("list 길이 : "+list.size());
-			//자신이 후원한 프로젝트의 후원을 모두 취소 했을 때 나올 총액 계산
-			for (ProjectDonateVO money : list) {
-				total += money.getDonateMoney();
-			}
-			
-			System.out.println("total : " + total);
+			// 돈을 반환하기 위해 취소할 프로젝트에 투자한 돈을 가져옴
+			int total=ss.selectOne("project.mydonatelist", vo);
 			
 			m.put("donateMoney", total);
-			m.put("memberNo", memberNo);
+			m.put("memberNo", vo.getMemberNo());
 			
-			ss.update("project.returnMoney", m);
+			ss.update("project.returnMoney", m);	// 반환해서 회원의 돈으로 추가시켜줌
 		}
 
 		// 후원 취소2 (행 삭제)
-		public void donateCancle(int donateNo) {
-			ss.delete("project.cancle", donateNo);
+		public void donateCancle(ProjectDonateVO vo) {
+			ss.delete("project.cancle", vo);	// 후원 취소
 		}
 		
 		public ProjectVO projectlist(String num) {

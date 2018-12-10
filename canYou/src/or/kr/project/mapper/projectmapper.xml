@@ -50,17 +50,14 @@
 	</select>
 	
 	<!-- 마이페이지 후원 목록 리스트 -->
-	<select id="mydonate" parameterType="int" resultType="projvo">
-		select projectNo ,memberNo
-		,projectName ,projectCost
-		,projectStartDate,
-		projectEndDate,projectFundCnt,
-		projectMainImage,projectStory,projectStep,projectStatus
-		,categoryNo,
-		projectCurCost from project where projectno in (
-		select projectno
-		from projectdonate
-		where memberno=#{num})
+	<select id="mydonate" parameterType="int" resultType="HashMap">
+		select d.donateNo, p.projectName, to_char(d.donateDay, 'yyyy.MM.dd') donateDay, d.donateMoney from projectdonate d, project p
+		where d.projectNo=p.projectNo and d.memberNo=#{memberNo}
+	</select>
+	
+	<!-- 상품 가격 가져오기 -->
+	<select id="prodcost" parameterType="int" resultType="int">
+		select productCost from product where productNo=#{productNo}
 	</select>
 	
 	<!-- 후원 추가 1 (행 추가) -->
@@ -68,16 +65,23 @@
 		<choose>
 			<when test="productNo!=0">
 				insert into projectdonate values(
-					donate_seq.nextVal,#{memberNo},#{projectNo},#{productNo},#{donateMoney},'선결제'
+					donate_seq.nextVal,#{memberNo},#{projectNo},#{productNo},#{donateMoney},'선결제', sysdate
 				)
 			</when>
 			<otherwise>
 				insert into projectdonate values(
-					donate_seq.nextVal,#{memberNo},#{projectNo},null,#{donateMoney},'선결제'
+					donate_seq.nextVal,#{memberNo},#{projectNo},null,#{donateMoney},'선결제', sysdate
 				)
 			</otherwise>
 		</choose>
 	</insert>
+	
+	<!-- 후원 추가 1 (상품 빼기) -->
+	<update id="prodput" parameterType="dvo">
+		update product
+		set productCnt = productCnt-1
+		where productNo=#{productNo}
+	</update>
 	
 	<!-- 후원 추가 1 (돈 빼기)-->
 	<update id="donateMoney" parameterType="HashMap">
@@ -86,11 +90,11 @@
 		where memberNo=#{memberNo}
 	</update>
 	
-	<!-- 후원 취소2 (행 삭제) -->
-	<delete id="cancle" parameterType="int">
+	<!-- 후원 취소2 (행 삭제) : 세션에서 가져온 회원 번호와 후원 번호가 일치해야 삭제가 됨 -->
+	<delete id="cancle" parameterType="dvo">
 		delete
 		from projectDonate
-		where memberNo = #{memberNo}
+		where memberNo=#{memberNo} and donateNo=#{donateNo}
 	</delete>
 	
 	<!-- 후원 취소 2 (돈 반환) -->
@@ -100,12 +104,11 @@
 		where memberNo=#{memberNo}
 	</update>
 	
-	<!-- 후원 취소를 하기 위해 자신이 한 프로젝트에
-	후원한 목록들을 가져오는 sql 구문 -->
-	<select id="mydonatelist" parameterType="int" resultType="dvo">
+	<!-- 후원 취소를 하기 위해 취소할 후원 프로젝트의 돈을 가져오는 sql 구문 -->
+	<select id="mydonatelist" parameterType="dvo" resultType="int">
 		select donateMoney
 		from projectDonate
-		where memberNo=#{memberNo}
+		where memberNo=#{memberNo} and donateNo=#{donateNo}
 	</select>
 	
 		<!-- 리스트 -->
