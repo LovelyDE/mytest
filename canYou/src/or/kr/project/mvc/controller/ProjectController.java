@@ -42,12 +42,13 @@ import or.kr.project.dto.ProjectDonateVO;
 import or.kr.project.dto.ProjectVO;
 import or.kr.project.dto.ReplyVO;
 import or.kr.project.dto.SearchVO;
+import or.kr.project.mvc.dao.projectDao;
 import or.kr.project.mvc.dao.projectDaoImple;
 
 @Controller
 public class ProjectController {
 	@Autowired
-	private projectDaoImple dao;
+	private projectDao dao;
 	
 	@RequestMapping(value="/")
 	public String index(HttpServletRequest request, Model model) {
